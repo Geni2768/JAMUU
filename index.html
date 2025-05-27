@@ -51,31 +51,38 @@ foreach ($_SESSION['keranjang'] as $bahan => $porsi) {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Jamuku - Pemesanan</title>
+    <title>Form Pemesanan Jamu</title>
 </head>
 <body>
     <h1>Form Pemesanan Jamu</h1>
 
+    <!-- Form Pemesanan -->
     <form method="post">
         <p><strong>Pilih Bahan:</strong></p>
         <?php foreach ($harga as $bahan => $nilai): ?>
             <label>
-                <input type="checkbox" name="bahan[]" value="<?= $bahan ?>"> <?= $bahan ?> (<?= $nilai ?>)
+                <input type="checkbox" name="bahan[]" value="<?= $bahan ?>">
+                <?= $bahan ?> (<?= $nilai ?>)
             </label><br>
         <?php endforeach; ?>
-        
-        <p><label>Jumlah Porsi: <input type="number" name="porsi" value="1" min="1" required></label></p>
-        
+
+        <p>
+            <label>Jumlah Porsi: 
+                <input type="number" name="porsi" value="1" min="1" required>
+            </label>
+        </p>
+
         <button type="submit" name="tambah">Tambah ke Keranjang</button>
         <button type="submit" name="reset">Reset Keranjang</button>
     </form>
 
+    <!-- Keranjang Belanja -->
     <h2>Keranjang Belanja</h2>
     <?php if (!empty($_SESSION['keranjang'])): ?>
         <ul>
             <?php foreach ($_SESSION['keranjang'] as $bahan => $porsi): ?>
                 <li>
-                    <?= $bahan ?> (<?= $porsi ?> porsi) - <?= $harga[$bahan] * $porsi ?> 
+                    <?= $bahan ?> (<?= $porsi ?> porsi) - <?= $harga[$bahan] * $porsi ?>
                     <form method="post" style="display:inline;">
                         <input type="hidden" name="hapus_bahan" value="<?= $bahan ?>">
                         <button type="submit">Hapus</button>
