@@ -13,7 +13,7 @@ if (!isset($_SESSION['keranjang'])) {
     $_SESSION['keranjang'] = [];
 }
 
-// Tambah bahan
+// Tambah bahan ke keranjang
 if (isset($_POST['tambah'])) {
     $nama = $_POST['nama'];
     $jumlah = intval($_POST['jumlah'] ?? 1);
@@ -22,21 +22,48 @@ if (isset($_POST['tambah'])) {
     }
 }
 
-// Hapus bahan
+// Hapus satu item dari keranjang
 if (isset($_POST['hapus'])) {
     $nama = $_POST['hapus'];
     unset($_SESSION['keranjang'][$nama]);
 }
 
-// Reset keranjang
+// Reset seluruh keranjang
 if (isset($_POST['reset'])) {
     $_SESSION['keranjang'] = [];
 }
 ?>
 
-<!-- TABEL DAFTAR BAHAN -->
-<h2 style="color:orange">Daftar Bahan</h2>
-<table border="1">
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Aplikasi Jamu</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 70%;
+        }
+        th, td {
+            border: 1px solid #aaa;
+            padding: 8px;
+            text-align: center;
+        }
+        h2 {
+            color: orange;
+        }
+        button {
+            background-color: orange;
+            border: none;
+            padding: 5px 10px;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Daftar Bahan</h2>
+<table>
     <tr>
         <th>Nama</th>
         <th>Jenis</th>
@@ -60,19 +87,19 @@ if (isset($_POST['reset'])) {
     <?php endforeach; ?>
 </table>
 
-<!-- TABEL KERANJANG BELANJA -->
-<h2 style="color:orange">Keranjang Belanja</h2>
-<table border="1">
+<h2>Keranjang Belanja</h2>
+<table>
     <tr>
         <th>Nama</th>
         <th>Jumlah</th>
         <th>Subtotal</th>
         <th>Aksi</th>
     </tr>
-    <?php 
+    <?php
     $total = 0;
-    foreach ($_SESSION['keranjang'] as $nama => $jumlah): 
-        $subtotal = $bahanList[$nama]['harga'] * $jumlah;
+    foreach ($_SESSION['keranjang'] as $nama => $jumlah):
+        $harga = $bahanList[$nama]['harga'];
+        $subtotal = $harga * $jumlah;
         $total += $subtotal;
     ?>
     <tr>
@@ -95,4 +122,7 @@ if (isset($_POST['reset'])) {
 <form method="post">
     <button type="submit" name="reset">Reset Keranjang</button>
 </form>
+
+</body>
+</html>
 
