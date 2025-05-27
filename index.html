@@ -42,6 +42,7 @@ if (isset($_POST['reset'])) {
         table {
             border-collapse: collapse;
             width: 70%;
+            margin-bottom: 20px;
         }
         th, td {
             border: 1px solid #aaa;
@@ -74,12 +75,12 @@ if (isset($_POST['reset'])) {
     <?php foreach ($bahanList as $nama => $info): ?>
     <tr>
         <form method="post">
-            <td><?= $nama ?></td>
-            <td><?= $info['jenis'] ?></td>
+            <td><?= htmlspecialchars($nama) ?></td>
+            <td><?= htmlspecialchars($info['jenis']) ?></td>
             <td><?= $info['harga'] ?></td>
             <td><input type="number" name="jumlah" value="1" min="1"></td>
             <td>
-                <input type="hidden" name="nama" value="<?= $nama ?>">
+                <input type="hidden" name="nama" value="<?= htmlspecialchars($nama) ?>">
                 <button type="submit" name="tambah">Tambah</button>
             </td>
         </form>
@@ -104,11 +105,11 @@ if (isset($_POST['reset'])) {
     ?>
     <tr>
         <form method="post">
-            <td><?= $nama ?></td>
+            <td><?= htmlspecialchars($nama) ?></td>
             <td><?= $jumlah ?></td>
             <td><?= $subtotal ?></td>
             <td>
-                <button type="submit" name="hapus" value="<?= $nama ?>">Hapus</button>
+                <button type="submit" name="hapus" value="<?= htmlspecialchars($nama) ?>">Hapus</button>
             </td>
         </form>
     </tr>
