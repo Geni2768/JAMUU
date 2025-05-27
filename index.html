@@ -1,19 +1,16 @@
 <?php
 session_start();
 
-// Daftar bahan
 $bahanList = [
     "Kunyit" => ["harga" => 1500, "jenis" => "Bahan utama"],
     "Jahe" => ["harga" => 1200, "jenis" => "Bahan utama"],
     "Gula Merah" => ["harga" => 1000, "jenis" => "Pemanis"]
 ];
 
-// Inisialisasi keranjang
 if (!isset($_SESSION['keranjang'])) {
     $_SESSION['keranjang'] = [];
 }
 
-// Tambah bahan ke keranjang
 if (isset($_POST['tambah'])) {
     $nama = $_POST['nama'];
     $jumlah = intval($_POST['jumlah'] ?? 1);
@@ -22,42 +19,53 @@ if (isset($_POST['tambah'])) {
     }
 }
 
-// Hapus satu item dari keranjang
 if (isset($_POST['hapus'])) {
     $nama = $_POST['hapus'];
     unset($_SESSION['keranjang'][$nama]);
 }
 
-// Reset seluruh keranjang
 if (isset($_POST['reset'])) {
     $_SESSION['keranjang'] = [];
 }
 ?>
-
 <!DOCTYPE html>
 <html>
 <head>
     <title>Aplikasi Jamu</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9e3;
+        }
+        h2 {
+            color: #006666;
+        }
         table {
+            width: 80%;
             border-collapse: collapse;
-            width: 70%;
+            background-color: #e0f7fa;
             margin-bottom: 20px;
         }
         th, td {
             border: 1px solid #aaa;
-            padding: 8px;
+            padding: 10px;
             text-align: center;
         }
-        h2 {
-            color: orange;
+        th {
+            background-color: #00acc1;
+            color: white;
         }
         button {
-            background-color: orange;
+            background-color: #009688;
+            color: white;
             border: none;
             padding: 5px 10px;
-            color: white;
             cursor: pointer;
+        }
+        .keranjang-section {
+            background-color: #b2dfdb;
+            padding: 10px;
+            width: 80%;
         }
     </style>
 </head>
@@ -88,6 +96,7 @@ if (isset($_POST['reset'])) {
     <?php endforeach; ?>
 </table>
 
+<div class="keranjang-section">
 <h2>Keranjang Belanja</h2>
 <table>
     <tr>
@@ -115,14 +124,15 @@ if (isset($_POST['reset'])) {
     </tr>
     <?php endforeach; ?>
     <tr>
-        <td colspan="2"><strong>Total</strong></td>
+        <td colspan="2"><strong>Total Belanja:</strong></td>
         <td colspan="2"><strong><?= $total ?></strong></td>
     </tr>
 </table>
-
 <form method="post">
     <button type="submit" name="reset">Reset Keranjang</button>
+    <button type="submit" name="bayar">Bayar</button>
 </form>
+</div>
 
 </body>
 </html>
