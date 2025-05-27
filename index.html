@@ -1,17 +1,11 @@
 <?php
 session_start();
 
-// Daftar harga bahan
-$harga = [
-    "Kunyit" => 1500,
-    "Jahe" => 1000,
-    "Madu" => 2200,
-    "Mengkudu" => 1200,
-    "Serai" => 900,
-    "Kapulaga" => 1000,
-    "Stevia" => 1200,
-    "Daun Pandan" => 800,
-    "Delima" => 1800,
+// Daftar harga dan jenis bahan
+$bahanList = [
+    "Kunyit" => ["harga" => 1500, "jenis" => "Bahan utama"],
+    "Jahe" => ["harga" => 1200, "jenis" => "Bahan utama"],
+    "Gula Merah" => ["harga" => 1000, "jenis" => "Pemanis"],
 ];
 
 // Inisialisasi keranjang
@@ -19,82 +13,281 @@ if (!isset($_SESSION['keranjang'])) {
     $_SESSION['keranjang'] = [];
 }
 
-// Tambah ke keranjang
+// Tambah bahan
 if (isset($_POST['tambah'])) {
-    $bahanTerpilih = $_POST['bahan'] ?? [];
-    $porsi = intval($_POST['porsi'] ?? 1);
-    foreach ($bahanTerpilih as $bahan) {
-        $_SESSION['keranjang'][$bahan] = $porsi;
+    $nama = $_POST['nama'];
+    $jumlah = intval($_POST['jumlah'] ?? 1);
+    if (isset($bahanList[$nama])) {
+        $_SESSION['keranjang'][$nama] = $jumlah;
     }
 }
 
-// Hapus bahan tertentu
-if (isset($_POST['hapus_bahan'])) {
-    $bahanHapus = $_POST['hapus_bahan'];
-    unset($_SESSION['keranjang'][$bahanHapus]);
+// Hapus bahan
+if (isset($_POST['hapus'])) {
+    $nama = $_POST['hapus'];
+    unset($_SESSION['keranjang'][$nama]);
 }
 
 // Reset keranjang
 if (isset($_POST['reset'])) {
     $_SESSION['keranjang'] = [];
 }
-
-// Hitung total
-$total = 0;
-foreach ($_SESSION['keranjang'] as $bahan => $porsi) {
-    if (isset($harga[$bahan])) {
-        $total += $harga[$bahan] * $porsi;
-    }
-}
 ?>
-
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Form Pemesanan Jamu</title>
+    <title>Pemesanan Jamu</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #fffef7;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #ffd580;
+        }
+        td {
+            background-color: #fff3cc;
+        }
+        h2 {
+            color: #ff6600;
+        }
+        .btn {
+            padding: 5px 12px;
+            border: none;
+            background: #ff9900;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background: #cc7a00;
+        }
+        .container {
+            background: #fff7e6;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .total {
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-    <h1>Form Pemesanan Jamu</h1>
-
-    <!-- Form Pemesanan -->
-    <form method="post">
-        <p><strong>Pilih Bahan:</strong></p>
-        <?php foreach ($harga as $bahan => $nilai): ?>
-            <label>
-                <input type="checkbox" name="bahan[]" value="<?= $bahan ?>">
-                <?= $bahan ?> (<?= $nilai ?>)
-            </label><br>
-        <?php endforeach; ?>
-
-        <p>
-            <label>Jumlah Porsi: 
-                <input type="number" name="porsi" value="1" min="1" required>
-            </label>
-        </p>
-
-        <button type="submit" name="tambah">Tambah ke Keranjang</button>
-        <button type="submit" name="reset">Reset Keranjang</button>
-    </form>
-
-    <!-- Keranjang Belanja -->
-    <h2>Keranjang Belanja</h2>
-    <?php if (!empty($_SESSION['keranjang'])): ?>
-        <ul>
-            <?php foreach ($_SESSION['keranjang'] as $bahan => $porsi): ?>
-                <li>
-                    <?= $bahan ?> (<?= $porsi ?> porsi) - <?= $harga[$bahan] * $porsi ?>
-                    <form method="post" style="display:inline;">
-                        <input type="hidden" name="hapus_bahan" value="<?= $bahan ?>">
-                        <button type="submit">Hapus</button>
-                    </form>
-                </li>
+    <div class="container">
+        <h2>Daftar Bahan</h2>
+        <table>
+            <tr>
+                <th>Nama</th>
+                <th>Jenis</th>
+                <th>Harga</th>
+                <th>Jumlah</th>
+                <th>Aksi</th>
+            </tr>
+            <?php foreach ($bahanList as $nama => $info): ?>
+            <tr>
+                <form method="post">
+                    <td><?= $nama ?></td>
+                    <td><?= $info['jenis'] ?></td>
+                    <td><?= $info['harga'] ?></td>
+                    <td>
+                        <input type="number" name="jumlah" value="1" min="1" required>
+                        <input type="hidden" name="nama" value="<?= $nama ?>">
+                    </td>
+                    <td><button type="submit" name="tambah" class="btn">Tambah</button></td>
+                </form>
+            </tr>
             <?php endforeach; ?>
-        </ul>
-    <?php else: ?>
-        <p><em>Keranjang kosong.</em></p>
-    <?php endif; ?>
+        </table>
 
-    <p><strong>Total Belanja: <?= $total ?></strong></p>
+        <h2>Keranjang Belanja</h2>
+        <table>
+            <tr>
+                <th>Nama</th>
+                <th>Jumlah</th>
+                <th>Subtotal</th>
+                <th>Aksi</th>
+            </tr>
+            <?php
+            $total = 0;
+            foreach ($_SESSION['keranjang'] as $nama => $jumlah):
+                $subtotal = $bahanList[$nama]['harga'] * $jumlah;
+                $total += $subtotal;
+            ?>
+            <tr>
+                <td><?= $nama ?></td>
+                <td><?= $jumlah ?></td>
+                <td><?= $subtotal ?></td>
+                <td>
+                    <form method="post" style="display:inline;">
+                        <input type="hidden" name="hapus" value="<?= $nama ?>">
+                        <button type="submit" class="btn">Hapus</button>
+                    </form>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+        </table>
+        <p class="total">Total Belanja: <?= $total ?></p>
+        <form method="post">
+            <button type="submit" name="reset" class="btn">Reset Keranjang</button>
+            <button type="submit" formaction="bayar.php" class="btn">Bayar</button>
+        </form>
+    </div>
+</body>
+</html>
+<?php
+session_start();
+
+// Daftar harga dan jenis bahan
+$bahanList = [
+    "Kunyit" => ["harga" => 1500, "jenis" => "Bahan utama"],
+    "Jahe" => ["harga" => 1200, "jenis" => "Bahan utama"],
+    "Gula Merah" => ["harga" => 1000, "jenis" => "Pemanis"],
+];
+
+// Inisialisasi keranjang
+if (!isset($_SESSION['keranjang'])) {
+    $_SESSION['keranjang'] = [];
+}
+
+// Tambah bahan
+if (isset($_POST['tambah'])) {
+    $nama = $_POST['nama'];
+    $jumlah = intval($_POST['jumlah'] ?? 1);
+    if (isset($bahanList[$nama])) {
+        $_SESSION['keranjang'][$nama] = $jumlah;
+    }
+}
+
+// Hapus bahan
+if (isset($_POST['hapus'])) {
+    $nama = $_POST['hapus'];
+    unset($_SESSION['keranjang'][$nama]);
+}
+
+// Reset keranjang
+if (isset($_POST['reset'])) {
+    $_SESSION['keranjang'] = [];
+}
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pemesanan Jamu</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #fffef7;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #ffd580;
+        }
+        td {
+            background-color: #fff3cc;
+        }
+        h2 {
+            color: #ff6600;
+        }
+        .btn {
+            padding: 5px 12px;
+            border: none;
+            background: #ff9900;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background: #cc7a00;
+        }
+        .container {
+            background: #fff7e6;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .total {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Daftar Bahan</h2>
+        <table>
+            <tr>
+                <th>Nama</th>
+                <th>Jenis</th>
+                <th>Harga</th>
+                <th>Jumlah</th>
+                <th>Aksi</th>
+            </tr>
+            <?php foreach ($bahanList as $nama => $info): ?>
+            <tr>
+                <form method="post">
+                    <td><?= $nama ?></td>
+                    <td><?= $info['jenis'] ?></td>
+                    <td><?= $info['harga'] ?></td>
+                    <td>
+                        <input type="number" name="jumlah" value="1" min="1" required>
+                        <input type="hidden" name="nama" value="<?= $nama ?>">
+                    </td>
+                    <td><button type="submit" name="tambah" class="btn">Tambah</button></td>
+                </form>
+            </tr>
+            <?php endforeach; ?>
+        </table>
+
+        <h2>Keranjang Belanja</h2>
+        <table>
+            <tr>
+                <th>Nama</th>
+                <th>Jumlah</th>
+                <th>Subtotal</th>
+                <th>Aksi</th>
+            </tr>
+            <?php
+            $total = 0;
+            foreach ($_SESSION['keranjang'] as $nama => $jumlah):
+                $subtotal = $bahanList[$nama]['harga'] * $jumlah;
+                $total += $subtotal;
+            ?>
+            <tr>
+                <td><?= $nama ?></td>
+                <td><?= $jumlah ?></td>
+                <td><?= $subtotal ?></td>
+                <td>
+                    <form method="post" style="display:inline;">
+                        <input type="hidden" name="hapus" value="<?= $nama ?>">
+                        <button type="submit" class="btn">Hapus</button>
+                    </form>
+                </td>
+            </tr>
+            <?php endforeach; ?>
+        </table>
+        <p class="total">Total Belanja: <?= $total ?></p>
+        <form method="post">
+            <button type="submit" name="reset" class="btn">Reset Keranjang</button>
+            <button type="submit" formaction="bayar.php" class="btn">Bayar</button>
+        </form>
+    </div>
 </body>
 </html>
 
