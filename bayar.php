@@ -1,10 +1,12 @@
 <?php
-require_once 'src/fungsi.php';
-
-$keranjang = ambilKeranjang();
+session_start();
 $total = 0;
-foreach ($keranjang as $item) {
-    $total += $item['harga'];
+
+if (isset($_SESSION['keranjang'])) {
+    foreach ($_SESSION['keranjang'] as $item) {
+        $total += $item['harga'];
+    }
+    $_SESSION['keranjang'] = []; // kosongkan keranjang setelah bayar
 }
 ?>
 <!DOCTYPE html>
@@ -14,14 +16,9 @@ foreach ($keranjang as $item) {
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Rincian Pembayaran</h1>
-    <ul>
-        <?php foreach ($keranjang as $item): ?>
-        <li><?= htmlspecialchars($item['nama']) ?> - Rp<?= htmlspecialchars($item['harga']) ?></li>
-        <?php endforeach; ?>
-    </ul>
-    <h2>Total: Rp<?= $total ?></h2>
-    <a href="index.php">Selesai</a>
+    <h1>Terima Kasih!</h1>
+    <p>Total pembayaran Anda: Rp <?= $total ?></p>
+    <a href="index.php">Kembali ke Daftar</a>
 </body>
 </html>
 

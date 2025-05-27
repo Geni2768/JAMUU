@@ -1,49 +1,35 @@
 <?php
 require_once 'src/fungsi.php';
-$bahan = ambilSemuaBahan();
+$data = ambilSemuaBahan();
 ?>
-
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Daftar Jamu</title>
-  <link rel="stylesheet" href="style.css">
+    <title>Daftar Bahan Jamu</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Daftar Bahan Jamu</h1>
-
-  <table border="1" cellpadding="10" cellspacing="0">
-    <thead>
-      <tr>
-        <th>No</th>
-        <th>Nama</th>
-        <th>Jenis</th>
-        <th>Deskripsi</th>
-        <th>Harga</th>
-        <th>Tambah</th>
-      </tr>
-    </thead>
-    <tbody>
-      <?php foreach ($bahan as $index => $item): ?>
+    <h1>Daftar Bahan Jamu</h1>
+    <table>
         <tr>
-          <td><?= $index + 1 ?></td>
-          <td><?= htmlspecialchars($item['nama']) ?></td>
-          <td><?= htmlspecialchars($item['jenis']) ?></td>
-          <td><?= htmlspecialchars($item['deskripsi']) ?></td>
-          <td>Rp<?= number_format($item['harga'], 0, ',', '.') ?></td>
-          <td>
-            <form action="keranjang.php" method="post">
-              <input type="hidden" name="id" value="<?= $item['id'] ?>">
-              <button type="submit">Tambah</button>
-            </form>
-          </td>
+            <th>Nama</th>
+            <th>Jenis</th>
+            <th>Deskripsi</th>
+            <th>Harga</th>
+            <th>Aksi</th>
         </tr>
-      <?php endforeach; ?>
-    </tbody>
-  </table>
-
-  <p><a href="keranjang.php">Lihat Keranjang</a></p>
+        <?php foreach ($data as $bahan): ?>
+        <tr>
+            <td><?= htmlspecialchars($bahan['nama']) ?></td>
+            <td><?= htmlspecialchars($bahan['jenis']) ?></td>
+            <td><?= htmlspecialchars($bahan['deskripsi']) ?></td>
+            <td><?= htmlspecialchars($bahan['harga']) ?></td>
+            <td>
+                <a href="keranjang.php?id=<?= $bahan['id'] ?>">Tambah</a>
+            </td>
+        </tr>
+        <?php endforeach; ?>
+    </table>
 </body>
 </html>
 

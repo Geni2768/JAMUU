@@ -1,15 +1,20 @@
 <?php
 require_once 'src/fungsi.php';
+session_start();
 
-if (isset($_GET['tambah'])) {
-    $id = $_GET['tambah'];
-    tambahKeranjang($id);
-} elseif (isset($_GET['hapus'])) {
-    $id = $_GET['hapus'];
-    hapusKeranjang($id);
+if (!isset($_SESSION['keranjang'])) {
+    $_SESSION['keranjang'] = [];
 }
 
-$keranjang = ambilKeranjang();
+if (isset($_GET['id'])) {
+    $id = $_GET['id'];
+    $bahan = ambilBahanById($id);
+    if ($bahan) {
+        $_SESSION['keranjang'][] = $bahan;
+    }
+}
+
+$keranjang = $_SESSION['keranjang'];
 ?>
 <!DOCTYPE html>
 <html>
@@ -22,18 +27,17 @@ $keranjang = ambilKeranjang();
     <table>
         <tr>
             <th>Nama</th>
+            <th>Jenis</th>
             <th>Harga</th>
-            <th>Aksi</th>
         </tr>
         <?php foreach ($keranjang as $item): ?>
         <tr>
             <td><?= htmlspecialchars($item['nama']) ?></td>
+            <td><?= htmlspecialchars($item['jenis']) ?></td>
             <td><?= htmlspecialchars($item['harga']) ?></td>
-            <td><a href="keranjang.php?hapus=<?= $item['id'] ?>">Hapus</a></td>
         </tr>
         <?php endforeach; ?>
     </table>
-    <a href="index.php">Kembali</a> |
     <a href="bayar.php">Bayar</a>
 </body>
 </html>
