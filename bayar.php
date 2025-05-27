@@ -1,25 +1,27 @@
 <?php
 require_once 'src/fungsi.php';
-$keranjang = getKeranjang();
-$total = totalHarga();
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    session_destroy();
-    echo "<p>Pembayaran berhasil. Terima kasih!</p>";
-    exit;
+
+$keranjang = ambilKeranjang();
+$total = 0;
+foreach ($keranjang as $item) {
+    $total += $item['harga'];
 }
 ?>
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Bayar</title>
+    <title>Bayar Jamu</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<h1>Form Pembayaran</h1>
-<form method="post">
-    Nama: <input type="text" name="nama"><br>
-    Alamat: <input type="text" name="alamat"><br>
-    <p>Total: Rp<?= $total ?></p>
-    <button type="submit">Bayar Sekarang</button>
-</form>
+    <h1>Rincian Pembayaran</h1>
+    <ul>
+        <?php foreach ($keranjang as $item): ?>
+        <li><?= htmlspecialchars($item['nama']) ?> - Rp<?= htmlspecialchars($item['harga']) ?></li>
+        <?php endforeach; ?>
+    </ul>
+    <h2>Total: Rp<?= $total ?></h2>
+    <a href="index.php">Selesai</a>
 </body>
 </html>
+
