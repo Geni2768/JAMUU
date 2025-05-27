@@ -1,84 +1,93 @@
+<?php
+session_start();
+
+// Daftar harga bahan
+$harga = [
+    "Kunyit" => 1500,
+    "Jahe" => 1000,
+    "Madu" => 2200,
+    "Mengkudu" => 1200,
+    "Serai" => 900,
+    "Kapulaga" => 1000,
+    "Stevia" => 1200,
+    "Daun Pandan" => 800,
+    "Delima" => 1800,
+];
+
+// Inisialisasi keranjang
+if (!isset($_SESSION['keranjang'])) {
+    $_SESSION['keranjang'] = [];
+}
+
+// Tambah ke keranjang
+if (isset($_POST['tambah'])) {
+    $bahanTerpilih = $_POST['bahan'] ?? [];
+    $porsi = intval($_POST['porsi'] ?? 1);
+    foreach ($bahanTerpilih as $bahan) {
+        $_SESSION['keranjang'][$bahan] = $porsi;
+    }
+}
+
+// Hapus bahan tertentu
+if (isset($_POST['hapus_bahan'])) {
+    $bahanHapus = $_POST['hapus_bahan'];
+    unset($_SESSION['keranjang'][$bahanHapus]);
+}
+
+// Reset keranjang
+if (isset($_POST['reset'])) {
+    $_SESSION['keranjang'] = [];
+}
+
+// Hitung total
+$total = 0;
+foreach ($_SESSION['keranjang'] as $bahan => $porsi) {
+    if (isset($harga[$bahan])) {
+        $total += $harga[$bahan] * $porsi;
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Daftar Bahan</title>
-  <style>
-    table, th, td { border: 1px solid black; border-collapse: collapse; padding: 8px; }
-    input[type="number"] { width: 50px; }
-  </style>
+    <title>Jamuku - Pemesanan</title>
 </head>
 <body>
-  <h1>Daftar Bahan</h1>
-  <table id="bahan-table"></table>
+    <h1>Form Pemesanan Jamu</h1>
 
-  <h2>Keranjang Belanja</h2>
-  <ul id="keranjang-list"></ul>
-  <p>Total Belanja: <span id="total-belanja">0</span></p>
-  <button onclick="resetKeranjang()">Reset Keranjang</button>
+    <form method="post">
+        <p><strong>Pilih Bahan:</strong></p>
+        <?php foreach ($harga as $bahan => $nilai): ?>
+            <label>
+                <input type="checkbox" name="bahan[]" value="<?= $bahan ?>"> <?= $bahan ?> (<?= $nilai ?>)
+            </label><br>
+        <?php endforeach; ?>
+        
+        <p><label>Jumlah Porsi: <input type="number" name="porsi" value="1" min="1" required></label></p>
+        
+        <button type="submit" name="tambah">Tambah ke Keranjang</button>
+        <button type="submit" name="reset">Reset Keranjang</button>
+    </form>
 
-  <script>
-    let bahanList = [];
-    let keranjang = [];
+    <h2>Keranjang Belanja</h2>
+    <?php if (!empty($_SESSION['keranjang'])): ?>
+        <ul>
+            <?php foreach ($_SESSION['keranjang'] as $bahan => $porsi): ?>
+                <li>
+                    <?= $bahan ?> (<?= $porsi ?> porsi) - <?= $harga[$bahan] * $porsi ?> 
+                    <form method="post" style="display:inline;">
+                        <input type="hidden" name="hapus_bahan" value="<?= $bahan ?>">
+                        <button type="submit">Hapus</button>
+                    </form>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    <?php else: ?>
+        <p><em>Keranjang kosong.</em></p>
+    <?php endif; ?>
 
-    // Ambil data dari PHP
-    fetch('get_bahan.php')
-      .then(res => res.json())
-      .then(data => {
-        bahanList = data;
-        tampilkanTabel(data);
-      });
-
-    function tampilkanTabel(data) {
-      const table = document.getElementById('bahan-table');
-      table.innerHTML = `<tr><th>Nama</th><th>Jenis</th><th>Harga</th><th>Jumlah</th><th>Aksi</th></tr>`;
-      data.forEach(bahan => {
-        table.innerHTML += `
-          <tr>
-            <td>${bahan.nama}</td>
-            <td>${bahan.jenis}</td>
-            <td>${bahan.harga}</td>
-            <td><input type="number" min="1" value="1" id="qty-${bahan.id}"></td>
-            <td><button onclick="tambahKeKeranjang(${bahan.id})">Tambah</button></td>
-          </tr>`;
-      });
-    }
-
-    function tambahKeKeranjang(id) {
-      const bahan = bahanList.find(b => b.id === id);
-      const qty = parseInt(document.getElementById(`qty-${id}`).value);
-
-      if (qty > 0) {
-        keranjang.push({ ...bahan, qty });
-        updateKeranjang();
-      }
-    }
-
-    function hapusItem(index) {
-      keranjang.splice(index, 1);
-      updateKeranjang();
-    }
-
-    function resetKeranjang() {
-      keranjang = [];
-      updateKeranjang();
-    }
-
-    function updateKeranjang() {
-      const list = document.getElementById('keranjang-list');
-      const total = document.getElementById('total-belanja');
-      list.innerHTML = '';
-      let totalBelanja = 0;
-
-      keranjang.forEach((item, i) => {
-        const subtotal = item.harga * item.qty;
-        totalBelanja += subtotal;
-        list.innerHTML += `
-          <li>${item.nama} - ${item.harga} x ${item.qty} = ${subtotal}
-          <button onclick="hapusItem(${i})">Hapus</button></li>`;
-      });
-
-      total.textContent = totalBelanja;
-    }
-  </script>
+    <p><strong>Total Belanja: <?= $total ?></strong></p>
 </body>
 </html>
+
