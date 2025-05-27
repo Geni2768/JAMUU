@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Daftar Bahan</title>
+  <style>
+    table, th, td { border: 1px solid black; border-collapse: collapse; padding: 8px; }
+    input[type="number"] { width: 50px; }
+  </style>
+</head>
+<body>
+  <h1>Daftar Bahan</h1>
+  <table id="bahan-table"></table>
+
+  <h2>Keranjang Belanja</h2>
+  <ul id="keranjang-list"></ul>
+  <p>Total Belanja: <span id="total-belanja">0</span></p>
+  <button onclick="resetKeranjang()">Reset Keranjang</button>
+
+  <script>
+    let bahanList = [];
+    let keranjang = [];
+
+    // Ambil data dari PHP
+    fetch('get_bahan.php')
+      .then(res => res.json())
+      .then(data => {
+        bahanList = data;
+        tampilkanTabel(data);
+      });
+
+    function tampilkanTabel(data) {
+      const table = document.getElementById('bahan-table');
+      table.innerHTML = `<tr><th>Nama</th><th>Jenis</th><th>Harga</th><th>Jumlah</th><th>Aksi</th></tr>`;
+      data.forEach(bahan => {
+        table.innerHTML += `
+          <tr>
+            <td>${bahan.nama}</td>
+            <td>${bahan.jenis}</td>
+            <td>${bahan.harga}</td>
+            <td><input type="number" min="1" value="1" id="qty-${bahan.id}"></td>
+            <td><button onclick="tambahKeKeranjang(${bahan.id})">Tambah</button></td>
+          </tr>`;
+      });
+    }
+
+    function tambahKeKeranjang(id) {
+      const bahan = bahanList.find(b => b.id === id);
+      const qty = parseInt(document.getElementById(`qty-${id}`).value);
+
+      if (qty > 0) {
+        keranjang.push({ ...bahan, qty });
+        updateKeranjang();
+      }
+    }
+
+    function hapusItem(index) {
+      keranjang.splice(index, 1);
+      updateKeranjang();
+    }
+
+    function resetKeranjang() {
+      keranjang = [];
+      updateKeranjang();
+    }
+
+    function updateKeranjang() {
+      const list = document.getElementById('keranjang-list');
+      const total = document.getElementById('total-belanja');
+      list.innerHTML = '';
+      let totalBelanja = 0;
+
+      keranjang.forEach((item, i) => {
+        const subtotal = item.harga * item.qty;
+        totalBelanja += subtotal;
+        list.innerHTML += `
+          <li>${item.nama} - ${item.harga} x ${item.qty} = ${subtotal}
+          <button onclick="hapusItem(${i})">Hapus</button></li>`;
+      });
+
+      total.textContent = totalBelanja;
+    }
+  </script>
+</body>
+</html>
