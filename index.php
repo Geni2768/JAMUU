@@ -1,5 +1,7 @@
 <?php
 session_start();
+// …dst
+?>
 
 // Daftar bahan
 $bahanList = [
