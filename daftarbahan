@@ -1,0 +1,64 @@
+<?php
+session_start();
+
+// Daftar bahan
+$bahanList = [
+    "Kunyit"     => ["harga" => 1500, "jenis" => "Bahan utama"],
+    "Jahe"       => ["harga" => 1200, "jenis" => "Bahan utama"],
+    "Gula Merah" => ["harga" => 1000, "jenis" => "Pemanis"]
+];
+
+// Tangani tombol “Tambah” (tetap diperlukan agar form tidak error)
+if (isset($_POST['tambah'])) {
+    // hanya simulasi, tidak disimpan
+    $nama = $_POST['nama'];
+    $jumlah = intval($_POST['jumlah'] ?? 1);
+    // di sini Anda bisa masukkan ke keranjang atau proses lain
+}
+?>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Daftar Bahan</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        table { border-collapse: collapse; width: 80%; }
+        th, td { border: 1px solid #444; padding: 8px; text-align: center; }
+        th { background: #555; color: #fff; }
+        button { padding: 4px 8px; background: #00796b; color: #fff; border: none; cursor: pointer; }
+        input[type="number"] { width: 50px; }
+    </style>
+</head>
+<body>
+
+<h2>Daftar Bahan</h2>
+<table>
+    <tr>
+        <th>Nama</th>
+        <th>Jenis</th>
+        <th>Harga (Rp)</th>
+        <th>Jumlah</th>
+        <th>Aksi</th>
+    </tr>
+    <?php foreach ($bahanList as $nama => $info): ?>
+    <tr>
+        <form method="post">
+            <td><?= htmlspecialchars($nama) ?></td>
+            <td><?= htmlspecialchars($info['jenis']) ?></td>
+            <td><?= number_format($info['harga'], 0, ',', '.') ?></td>
+            <td>
+                <input type="number" name="jumlah" value="1" min="1">
+            </td>
+            <td>
+                <input type="hidden" name="nama" value="<?= htmlspecialchars($nama) ?>">
+                <button type="submit" name="tambah">Tambah</button>
+            </td>
+        </form>
+    </tr>
+    <?php endforeach; ?>
+</table>
+
+</body>
+</html>
+
